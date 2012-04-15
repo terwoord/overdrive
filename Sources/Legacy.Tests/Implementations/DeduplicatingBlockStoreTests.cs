@@ -17,6 +17,21 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         {
             using (var xStore = CreateStore(4096, 32768, 32768))
             {
+                var xBlockBuffer = new byte[4096];
+                var xBlockBufferSeg = new ArraySegment<byte>(xBlockBuffer);
+
+                for (int i = 0; i < 4096; i++)
+                {
+                    xBlockBuffer[i] = (byte)i;
+                }
+
+                Assert.IsFalse(xStore.IsReserved(0));
+                xStore.Store(0, xBlockBufferSeg);
+                Assert.IsTrue(xStore.IsReserved(0));
+                xStore.Store(1, xBlockBufferSeg);
+
+                Assert.IsTrue(mRawBlockManager.IsReserved(0));
+                Assert.IsFalse(mRawBlockManager.IsReserved(1));
                 
             }
         }
@@ -41,6 +56,8 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
 
         private const string StoreSubdir = "OverdriveStore";
 
+        private IBlockManager mRawBlockManager;
+
         private DeduplicatingBlockStore CreateStore(uint blockSize, ulong virtualBlockCount, ulong rawBlockCount)
         {
             var xBaseDir = Path.Combine(Environment.CurrentDirectory, StoreSubdir);
@@ -58,7 +75,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
 
             var xRawBlockManagerFS = new FileStream(Path.Combine(xBaseDir, "RawBlockBitmap.bin"), FileMode.CreateNew);
             xRawBlockManagerFS.SetLength((long)(xRawBlockStore.BlockCount / 8));
-            var xRawBlockManager = new BitmapBlockManager(xRawBlockManagerFS, (ulong)(xRawBlockManagerFS.Length / blockSize), blockSize);
+            mRawBlockManager = new BitmapBlockManager(xRawBlockManagerFS, (ulong)(xRawBlockManagerFS.Length / blockSize), blockSize);
             
             var xVirtualBlockManagerFS = new FileStream(Path.Combine(xBaseDir, "VirtualBlocksBitmap.bin"), FileMode.CreateNew);
             xVirtualBlockManagerFS.SetLength((long)(virtualBlockCount / 8));
@@ -78,7 +95,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
             var xHashManager = new SimpleHashManager(xHashesDir);
 
 
-            return new DeduplicatingBlockStore(xVirtualBlockManager, xVirtualBlockStore, xRawBlockStore, xRawBlockManager, virtualBlockCount,
+            return new DeduplicatingBlockStore(xVirtualBlockManager, xVirtualBlockStore, xRawBlockStore, mRawBlockManager, virtualBlockCount,
                 xRawBlockUsageCounter, xHashManager);
         }
     }
