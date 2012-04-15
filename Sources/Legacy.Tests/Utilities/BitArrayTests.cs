@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TerWoord.OverDriveStorage.Legacy.Utilities;
+using TerWoord.OverDriveStorage.Tests.TestUtilities;
 
 namespace TerWoord.OverDriveStorage.Legacy.Tests.Utilities
 {
@@ -34,6 +35,13 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Utilities
             Assert.IsFalse(xBitArray[31]);
             Assert.IsTrue(xBitArray[32]);
             Assert.IsFalse(xBitArray[33]);
+        }
+
+        [TestMethod]
+        [ExpectedArgumentNullException(Argument="bytes")]
+        public void TestError_NoByteArray()
+        {
+            var xArray = new BitArray(null);
         }
     }
 }

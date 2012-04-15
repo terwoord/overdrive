@@ -43,7 +43,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Implementations\BaseBlockStoreTests.cs" />
     <Compile Include="Implementations\BitmapBlockManagerTests.cs" />
+    <Compile Include="Implementations\DeduplicatingBlockStoreTests.cs" />
     <Compile Include="Implementations\SimpleStreamBlockStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\BitArrayTests.cs" />

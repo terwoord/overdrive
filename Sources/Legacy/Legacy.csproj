@@ -48,7 +48,9 @@
     <Compile Include="Implementations\BitmapBlockManager.cs" />
     <Compile Include="Implementations\DeduplicatingBlockStore.cs" />
     <Compile Include="Implementations\DeduplicatingBlockStore.Impl.cs" />
+    <Compile Include="Implementations\SimpleHashManager.cs" />
     <Compile Include="Implementations\SimpleStreamBlockStore.cs" />
+    <Compile Include="Implementations\SimpleUsageCountStore.cs" />
     <Compile Include="IUsageCountStore.cs" />
     <Compile Include="Utilities\BitArray.cs" />
     <Compile Include="Utilities\ByteConverter.cs" />

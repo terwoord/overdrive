@@ -40,10 +40,10 @@
     </Compile>
     <Compile Include="IBlockManager.cs" />
     <Compile Include="IBlockStore.cs" />
+    <Compile Include="Utilities\ReaderWriterLocker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Implementations\" />
-    <Folder Include="Utilities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

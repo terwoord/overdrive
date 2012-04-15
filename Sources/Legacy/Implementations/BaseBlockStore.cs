@@ -24,7 +24,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
 
         protected void CheckDisposed()
         {
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("DeduplicatingBlockStore");
             }
