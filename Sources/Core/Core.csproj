@@ -39,6 +39,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="IBlockManager.cs" />
+    <Compile Include="IBlockManagingStore.cs" />
     <Compile Include="IBlockStore.cs" />
     <Compile Include="Utilities\ReaderWriterLocker.cs" />
   </ItemGroup>

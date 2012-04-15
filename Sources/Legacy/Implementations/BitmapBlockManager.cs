@@ -123,5 +123,10 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
                 mBitmap.Id = value + "-Bitmap";
             }
         }
+
+        public void Flush()
+        {
+
+        }
     }
 }

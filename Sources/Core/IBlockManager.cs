@@ -44,5 +44,7 @@ namespace TerWoord.OverDriveStorage
             set;
         }
 
+        void Flush();
+
     } // interface
 }

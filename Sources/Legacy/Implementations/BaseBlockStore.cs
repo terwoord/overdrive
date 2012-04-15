@@ -92,5 +92,9 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             get;
             set;
         }
+
+        public virtual void Flush()
+        {
+        }
     }
 }

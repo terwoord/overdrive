@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Legacy", "Legacy\Legacy.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Legacy.Tests", "Legacy.Tests\Legacy.Tests.csproj", "{89B8E6B8-B616-40DF-A8C2-C1D9B5A0223C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTester", "PerfTester\PerfTester.csproj", "{C136C101-A05D-43CE-90BC-6AA0BD989AD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{89B8E6B8-B616-40DF-A8C2-C1D9B5A0223C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89B8E6B8-B616-40DF-A8C2-C1D9B5A0223C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89B8E6B8-B616-40DF-A8C2-C1D9B5A0223C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C136C101-A05D-43CE-90BC-6AA0BD989AD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C136C101-A05D-43CE-90BC-6AA0BD989AD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C136C101-A05D-43CE-90BC-6AA0BD989AD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C136C101-A05D-43CE-90BC-6AA0BD989AD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

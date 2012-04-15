@@ -7,7 +7,7 @@ using TerWoord.OverDriveStorage.Legacy.Utilities;
 
 namespace TerWoord.OverDriveStorage.Legacy.Implementations
 {
-    public partial class DeduplicatingBlockStore: BaseBlockStore, IBlockManager
+    public partial class DeduplicatingBlockStore: BaseBlockStore, IBlockManager, IBlockManagingStore
     {
         public DeduplicatingBlockStore(IBlockManager virtualBlockManager, IBlockStore virtualBlockStore, IBlockStore rawBlockStore, IBlockManager rawBlockManager, ulong virtualBlockCount, IUsageCountStore rawBlockUsageCountStore, IHashManager rawBlockHashManager)
         {
