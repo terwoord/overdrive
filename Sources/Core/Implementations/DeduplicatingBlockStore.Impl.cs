@@ -9,7 +9,8 @@ namespace TerWoord.OverDriveStorage.Implementations
 {
     partial class DeduplicatingBlockStore
     {
-        private readonly ObjectPool<ArraySegment<byte>> _blockBufferPool;
+        private readonly ObjectPool<ArraySegment<byte>> _rawBlockBufferPool;
+        private readonly ObjectPool<ArraySegment<byte>> _virtualBlockBufferPool;
 
         public int MaxDedupCandidates = 0;
 
@@ -22,7 +23,7 @@ namespace TerWoord.OverDriveStorage.Implementations
             #region find deduplicated block
 
             var xAllBlocksWithSameCRC = _rawBlockHashManager.GetAllBlocksWithCRC32(xCRC);
-            var xCandidateBlockBuff = _blockBufferPool.Acquire();
+            var xCandidateBlockBuff = _rawBlockBufferPool.Acquire();
             try
             {
                 foreach (var xItem in xAllBlocksWithSameCRC)
@@ -37,7 +38,7 @@ namespace TerWoord.OverDriveStorage.Implementations
             }
             finally
             {
-                _blockBufferPool.Release(xCandidateBlockBuff);
+                _rawBlockBufferPool.Release(xCandidateBlockBuff);
             }
 
             #endregion find deduplicated block
@@ -53,44 +54,48 @@ namespace TerWoord.OverDriveStorage.Implementations
 
         private void SetRawBlockIdForVirtualBlock(ulong index, ulong rawBlockId, uint blockCrc)
         {
-            var blockSeg = _blockBufferPool.Acquire();
+            var blockSeg = _rawBlockBufferPool.Acquire();
             var blockBuff = blockSeg.Array;
             try
             {
-                var virtualBlockStorePage = index / _virtualBlocksPerBlock;
-                var virtualBlockStorePageOffset = (index % _virtualBlocksPerBlock) * 8;
-
-                _virtualBlockStore.Retrieve(virtualBlockStorePage, blockSeg);
-
-                if (_virtualBlockManager.IsReserved(index))
+                var virtSeg = _virtualBlockBufferPool.Acquire();
+                try
                 {
-                    // there's already a block in the given virtualblock, which means we have to decrement the UsageCoutn for the old block first
-                    var oldRawBlockId = ByteConverter.ReadUInt64(blockBuff, (int)virtualBlockStorePageOffset);
-                    _rawBlockUsageCountStore.Decrement(oldRawBlockId);
-                }
-                ByteConverter.WriteBytes((ulong)rawBlockId, blockBuff, (int)virtualBlockStorePageOffset);
-                _virtualBlockStore.Store(virtualBlockStorePage, blockSeg);
-                _virtualBlockManager.MarkReserved(index);
-                _rawBlockUsageCountStore.Increment(rawBlockId);
+                    _virtualBlockStore.Retrieve(index, virtSeg);
 
-                if (_rawBlockUsageCountStore.HasEntriesWhichReachedZero)
-                {
-                    var xEntries = _rawBlockUsageCountStore.GetZeroReachedEntries();
-                    foreach (var xEntry in xEntries)
+                    if (_virtualBlockManager.IsReserved(index))
                     {
-                        Console.WriteLine("Todo in DedupStore.SetRawBlockIdForVirtualBlock");
-                        // todo: somehow cache crc value of blocks
-                        _rawBlockStore.Retrieve(xEntry, blockSeg);
-                        var xCrc = Crc32.Compute(blockBuff);
-
-                        _rawBlockHashManager.RemoveBlock(xEntry, xCrc);
-                        _rawBlockManager.Free(xEntry);
+                        // there's already a block in the given virtualblock, which means we have to decrement the UsageCoutn for the old block first
+                        var oldRawBlockId = ByteConverter.ReadUInt64(virtSeg.Array, 0);
+                        _rawBlockUsageCountStore.Decrement(oldRawBlockId);
                     }
+                    ByteConverter.WriteBytes((ulong)rawBlockId, virtSeg.Array, 0);
+                    _virtualBlockStore.Store(index, virtSeg);
+                    _virtualBlockManager.MarkReserved(index);
+                    _rawBlockUsageCountStore.Increment(rawBlockId);
+
+                    if (_rawBlockUsageCountStore.HasEntriesWhichReachedZero)
+                    {
+                        var xEntries = _rawBlockUsageCountStore.GetZeroReachedEntries();
+                        foreach (var xEntry in xEntries)
+                        {
+                            // todo: somehow cache crc value of blocks
+                            _rawBlockStore.Retrieve(xEntry, blockSeg);
+                            var xCrc = Crc32.Compute(blockBuff);
+
+                            _rawBlockHashManager.RemoveBlock(xEntry, xCrc);
+                            _rawBlockManager.Free(xEntry);
+                        }
+                    }
+                }
+                finally
+                {
+                    _virtualBlockBufferPool.Release(virtSeg);
                 }
             }
             finally
             {
-                _blockBufferPool.Release(blockSeg);
+                _rawBlockBufferPool.Release(blockSeg);
             }
         }
 
@@ -131,20 +136,17 @@ namespace TerWoord.OverDriveStorage.Implementations
             {
                 throw new Exception(string.Format("Cannot retrieve a free block! (Block index = {0})", index));
             }
-            var seg = _blockBufferPool.Acquire();
+            var seg = _rawBlockBufferPool.Acquire();
             var buff = seg.Array;
             try
             {
-                var virtualBlockStorePage = index / _virtualBlocksPerBlock;
-                var virtualBlockStorePageOffset = (index % _virtualBlocksPerBlock) * 8;
-
-                _virtualBlockStore.Retrieve(virtualBlockStorePage, seg);
-                var rawBlockId = ByteConverter.ReadUInt64(buff, (int)virtualBlockStorePageOffset);
+                _virtualBlockStore.Retrieve(index, seg);
+                var rawBlockId = ByteConverter.ReadUInt64(buff, 0);
                 _rawBlockStore.Retrieve(rawBlockId, buffer);
             }
             finally
             {
-                _blockBufferPool.Release(seg);
+                _rawBlockBufferPool.Release(seg);
             }
         }
 

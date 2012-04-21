@@ -44,19 +44,14 @@ namespace TerWoord.OverDriveStorage.Implementations
             _rawBlockHashManager = rawBlockHashManager;
 
             _blockSize = rawBlockStore.BlockSize;
-            _virtualBlocksPerBlock = _blockSize / 8;
 
-            // now do checks
-            if (_virtualBlockStore.BlockSize != _blockSize)
+            if (virtualBlockStore.BlockCount != _virtualBlockCount)
             {
-                throw new Exception("VirtualBlockStore.BlockSize != RawBlockStore.BlockSize");
+                throw new Exception(String.Format("BlockCount of VirtualBlockStore not correct! (Expected = {0}, Actual = {1})", _virtualBlockCount, virtualBlockStore.BlockCount));
             }
-            if (_virtualBlockStore.BlockCount != (virtualBlockCount / _virtualBlocksPerBlock))
-            {
-                throw new Exception("VirtualBlockStore.BlockCount != (virtualBlockCount / virtualBlocksPerBlock)");
-            }
-
-            _blockBufferPool = new ObjectPool<ArraySegment<byte>>(() => new ArraySegment<byte>(new byte[_blockSize]));
+            
+            _rawBlockBufferPool = new ObjectPool<ArraySegment<byte>>(() => new ArraySegment<byte>(new byte[_blockSize]));
+            _virtualBlockBufferPool = new ObjectPool<ArraySegment<byte>>(() => new ArraySegment<byte>(new byte[8]));
         }
 
         private readonly IBlockManager _virtualBlockManager;
@@ -68,8 +63,7 @@ namespace TerWoord.OverDriveStorage.Implementations
         private readonly IHashManager<uint> _rawBlockHashManager;
 
         private readonly uint _blockSize;
-        private readonly uint _virtualBlocksPerBlock;
-
+        
         protected override void DoDispose()
         {
             _virtualBlockStore.Dispose();

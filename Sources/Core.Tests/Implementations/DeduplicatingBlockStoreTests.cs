@@ -74,12 +74,12 @@ namespace TerWoord.OverDriveStorage.Tests.Implementations
             mRawBlockManager = new BitmapBlockManager(xRawBlockManagerFS, (ulong)(xRawBlockManagerFS.Length / blockSize), blockSize);
 
             var xVirtualBlockManagerFS = new FileStream(Path.Combine(xBaseDir, "VirtualBlocksBitmap.bin"), FileMode.CreateNew);
-            xVirtualBlockManagerFS.SetLength((long)(virtualBlockCount / 8));
+            xVirtualBlockManagerFS.SetLength((long)(virtualBlockCount /8 ));
             var xVirtualBlockManager = new BitmapBlockManager(xVirtualBlockManagerFS, virtualBlockCount / blockSize / 8, blockSize);
 
             var xVirtualBlockStoreFS = new FileStream(Path.Combine(xBaseDir, "VirtualBlocks.bin"), FileMode.CreateNew);
             xVirtualBlockStoreFS.SetLength((long)(virtualBlockCount * 8));
-            var xVirtualBlockStore = new SimpleStreamBlockStore(xVirtualBlockStoreFS, blockSize);
+            var xVirtualBlockStore = new SimpleStreamBlockStore(xVirtualBlockStoreFS, 8);
 
             var xRawBlockUsageCounterFS = new FileStream(Path.Combine(xBaseDir, "RawBlockUsageCounts.bin"), FileMode.CreateNew);
             xRawBlockUsageCounterFS.SetLength((long)(rawBlockCount * 8));
