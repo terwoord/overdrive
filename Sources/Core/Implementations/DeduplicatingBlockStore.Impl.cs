@@ -104,11 +104,11 @@ namespace TerWoord.OverDriveStorage.Implementations
             {
                 throw new ArgumentNullException("buff2");
             }
-            if (buff.Length >= (buffOffset + length))
+            if (buff.Length > (buffOffset + length))
             {
                 throw new ArgumentException("Buffer not long enough!", "buff");
             }
-            if (buff2.Length >= (buff2Offset + length))
+            if (buff2.Length > (buff2Offset + length))
             {
                 throw new ArgumentException("Buffer not long enough!", "buff");
             }

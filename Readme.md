@@ -46,7 +46,7 @@ Dokan (http://dokan-dev.net/en/) or as backend for some iSCSI target library.
 
 # License
 
-Copyright (c) 2007-2008, The Cosmos Project
+Copyright (c) 2007-2008, The OverDrive Storage Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted 

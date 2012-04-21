@@ -45,6 +45,7 @@
     <Compile Include="TestUtilities\ExpectedArgumentNullExceptionAttribute.cs" />
     <Compile Include="TestUtilities\ExpectedExceptionMessageAttribute.cs" />
     <Compile Include="Utilities\BitArrayTests.cs" />
+    <Compile Include="Utilities\ByteConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

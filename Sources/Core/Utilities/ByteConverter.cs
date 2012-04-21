@@ -32,14 +32,14 @@ namespace TerWoord.OverDriveStorage.Utilities
             }
             unchecked
             {
-                buffer[0] = (byte)(value >> 54);
-                buffer[1] = (byte)(value >> 48);
-                buffer[2] = (byte)(value >> 40);
-                buffer[3] = (byte)(value >> 32);
-                buffer[4] = (byte)(value >> 24);
-                buffer[5] = (byte)(value >> 16);
-                buffer[6] = (byte)(value >> 8);
-                buffer[7] = (byte)value;
+                buffer[offset+0] = (byte)value;
+                buffer[offset+1] = (byte)(value >> 8);
+                buffer[offset+2] = (byte)(value >> 16);
+                buffer[offset+3] = (byte)(value >> 24);
+                buffer[offset+4] = (byte)(value >> 32);
+                buffer[offset+5] = (byte)(value >> 40);
+                buffer[offset+6] = (byte)(value >> 48);
+                buffer[offset+7] = (byte)(value >> 56);
                 //    return buffer[offset + 7]
                 //        | (buffer[offset + 6] << 8)
                 //        | (buffer[offset + 5] << 16)
@@ -85,14 +85,14 @@ namespace TerWoord.OverDriveStorage.Utilities
             }
             unchecked
             {
-                uint xLow = (uint)(buffer[offset + 7]
-                    | (buffer[offset + 6] << 8)
-                    | (buffer[offset + 5] << 16)
-                    | (buffer[offset + 4] << 24));
-                uint xHigh = (uint)(buffer[offset + 3]
-                | (buffer[offset + 2] << 8)
-                | (buffer[offset + 1] << 16)
-                | (buffer[offset] << 24));
+                uint xLow = (uint)((buffer[offset + 3] << 24)
+                    | (buffer[offset + 2] << 16)
+                    | (buffer[offset + 1] << 8)
+                    | (buffer[offset]));
+                uint xHigh = (uint)((buffer[offset + 7] << 24)
+                | (buffer[offset + 6] << 16)
+                | (buffer[offset + 5] << 8)
+                | (buffer[offset + 4]));
                 //return (ulong)xLow | (((ulong)(uint)xHigh) << 32);
                 return ((ulong)xLow) | (((ulong)xHigh) << 32);
             }
