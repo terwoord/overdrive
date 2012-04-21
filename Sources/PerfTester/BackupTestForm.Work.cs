@@ -320,7 +320,7 @@ namespace PerfTester
 
             var xVirtualBlockStoreFS = new FileStream(Path.Combine(dataStoreDir, "VirtualBlocks.bin"), FileMode.Create);
             xVirtualBlockStoreFS.SetLength(StoreSize);
-            var xVirtualBlockStore = new SimpleStreamBlockStore(xVirtualBlockStoreFS, BlockSize);
+            var xVirtualBlockStore = new SimpleStreamBlockStore(xVirtualBlockStoreFS, 8);
 
             var xRawBlockManagerFS = new FileStream(Path.Combine(dataStoreDir, "RawBlockBitmap.bin"), FileMode.Create);
             xRawBlockManagerFS.SetLength((long)(xRawBlockStore.BlockCount / 8));
