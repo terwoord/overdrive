@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
 using TerWoord.OverDriveStorage.Tests.TestUtilities;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Tests.Utilities
+namespace TerWoord.OverDriveStorage.Tests.Utilities
 {
     [TestClass]
     public class BitArrayTests
@@ -38,7 +38,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Utilities
         }
 
         [TestMethod]
-        [ExpectedArgumentNullException(Argument="bytes")]
+        [ExpectedArgumentNullException(Argument = "bytes")]
         public void TestError_NoByteArray()
         {
             var xArray = new BitArray(null);

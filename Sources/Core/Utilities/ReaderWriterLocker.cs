@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace TerWoord.OverDriveStorage
+namespace TerWoord.OverDriveStorage.Utilities
 {
     public class ReaderWriterLocker
     {
@@ -15,6 +15,7 @@ namespace TerWoord.OverDriveStorage
             }
 
             private bool _disposed;
+
             void IDisposable.Dispose()
             {
                 if (_disposed)
@@ -37,6 +38,7 @@ namespace TerWoord.OverDriveStorage
             }
 
             private bool _disposed;
+
             void IDisposable.Dispose()
             {
                 if (_disposed)

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections.Concurrent;
 
-namespace TerWoord.OverDriveStorage.Legacy.Utilities
+namespace TerWoord.OverDriveStorage.Utilities
 {
     public class ObjectPool<T>
     {

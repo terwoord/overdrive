@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
+using TerWoord.OverDriveStorage;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
-    public class SimpleHashManager : IHashManager
+    public class SimpleHashManager : IHashManager<uint>
     {
         private class HashPage
         {
@@ -14,7 +15,8 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             {
                 PageLock = new ReaderWriterLocker();
             }
-            public RawLinkedList<HashEntry> HashList;
+
+            public LinkedList<HashEntry> HashList;
             public readonly ReaderWriterLocker PageLock;
             public Stream File;
         }
@@ -26,6 +28,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         }
 
         private bool _disposed;
+
         public void Dispose()
         {
             if (_disposed)
@@ -55,7 +58,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             {
                 var xPage = new HashPage(i);
                 xPage.File = new FileStream(Path.Combine(baseDir, i.ToString() + ".hsh"), FileMode.Create);
-                var xList = new RawLinkedList<HashEntry>();
+                var xList = new LinkedList<HashEntry>();
                 xPage.HashList = xList;
                 _hashPages[i] = xPage;
 
@@ -63,7 +66,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             }
         }
 
-        private static void ReadHashesFromFile(RawLinkedList<HashEntry> list, Stream fs)
+        private static void ReadHashesFromFile(LinkedList<HashEntry> list, Stream fs)
         {
             var xBuff = new byte[8];
             while (fs.Position < fs.Length)
@@ -80,12 +83,12 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             }
         }
 
-        private static void WriteHashesToFile(RawLinkedList<HashEntry> list, Stream fs)
+        private static void WriteHashesToFile(LinkedList<HashEntry> list, Stream fs)
         {
             fs.SetLength(0);
             fs.Position = 0;
             var xItem = list.First;
-            while(xItem!=null)
+            while (xItem != null)
             {
                 fs.Write(BitConverter.GetBytes(xItem.Value.CRC32), 0, 4);
                 fs.Write(BitConverter.GetBytes(xItem.Value.BlockId), 0, 4);
@@ -109,7 +112,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
 
         private readonly string _baseDir;
 
-        public RawLinkedList<ulong> GetAllBlocksWithCRC32(uint crc)
+        public IEnumerable<ulong> GetAllBlocksWithCRC32(uint crc)
         {
             var xFirstByte = (byte)(crc & 0xFF);
             HashPage xPage;
@@ -117,18 +120,16 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             using (xPage.PageLock.EnterReadLock())
             {
                 var xListCount = xPage.HashList.Count;
-                var xResult = new RawLinkedList<ulong>();
                 var xItem = xPage.HashList.First;
                 while (xItem != null)
                 {
                     var xEntry = xItem.Value;
                     if (xEntry.CRC32 == crc)
                     {
-                        xResult.AddLast(xEntry.BlockId);
+                        yield return xEntry.BlockId;
                     }
                     xItem = xItem.Next;
                 }
-                return xResult;
             }
         }
 

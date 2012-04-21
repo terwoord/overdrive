@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace TerWoord.OverDriveStorage.Legacy
+namespace TerWoord.OverDriveStorage.Utilities
 {
     public class Crc32// : HashAlgorithm
     {

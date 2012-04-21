@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerWoord.OverDriveStorage.Legacy.Implementations;
+using TerWoord.OverDriveStorage.Implementations;
 using TerWoord.OverDriveStorage.Tests.TestUtilities;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
+namespace TerWoord.OverDriveStorage.Tests.Implementations
 {
     [TestClass]
     public class BaseBlockStoreTests
@@ -16,6 +17,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         {
             public List<ulong> BlocksStored = new List<ulong>();
             public List<ulong> BlocksRead = new List<ulong>();
+
             public override void Store(ulong index, ArraySegment<byte> buffer)
             {
                 BlocksStored.Add(index);
@@ -25,7 +27,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
             public override void Retrieve(ulong index, ArraySegment<byte> buffer)
             {
                 BlocksRead.Add(index);
-                ByteConverter.WriteBytes(index, buffer.Array, buffer.Offset);                
+                ByteConverter.WriteBytes(index, buffer.Array, buffer.Offset);
             }
 
             public override uint BlockSize
@@ -60,7 +62,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
 
             public override void DumpCacheInfo(System.IO.StreamWriter output, string linePrefix)
             {
-                DumpCacheInfoCalled++;                
+                DumpCacheInfoCalled++;
             }
         }
 
@@ -78,7 +80,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
             xTester.Dispose();
             xTester.Dispose();
         }
-
 
         [TestMethod]
         public void TestMultipleStore()
@@ -125,7 +126,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         }
 
         [TestMethod]
-        [ExpectedExceptionMessage(Message="Buffer size not correct!")]
+        [ExpectedExceptionMessage(Message = "Buffer size not correct!")]
         public void TestError_ReadMultipleWrongBufferSize()
         {
             using (var xTester = new BlockStoreTester())
@@ -146,7 +147,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
                 xTester.BlockSizeSet = 1;
                 xTester.BlockCountSet = 1;
                 var xBlock = new byte[1];
-                xTester.Store(new ulong[]{2, 3}, new ArraySegment<byte>(xBlock));
+                xTester.Store(new ulong[] { 2, 3 }, new ArraySegment<byte>(xBlock));
             }
         }
 
@@ -156,9 +157,9 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         {
             var xTester = new BlockStoreTester();
             xTester.BlockSizeSet = 1;
-                xTester.BlockCountSet = 1;
-                var xBlock = new byte[1];
-                
+            xTester.BlockCountSet = 1;
+            var xBlock = new byte[1];
+
             xTester.Dispose();
             xTester.Store(new ulong[] { 2, 3 }, new ArraySegment<byte>(xBlock));
         }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
-    public partial class DeduplicatingBlockStore: BaseBlockStore, IBlockManager, IBlockManagingStore
+    public partial class DeduplicatingBlockStore : BaseBlockStore, IBlockManager, IBlockManagingStore
     {
-        public DeduplicatingBlockStore(IBlockManager virtualBlockManager, IBlockStore virtualBlockStore, IBlockStore rawBlockStore, IBlockManager rawBlockManager, ulong virtualBlockCount, IUsageCountStore rawBlockUsageCountStore, IHashManager rawBlockHashManager)
+        public DeduplicatingBlockStore(IBlockManager virtualBlockManager, IBlockStore virtualBlockStore, IBlockStore rawBlockStore, IBlockManager rawBlockManager, ulong virtualBlockCount, IUsageCountStore rawBlockUsageCountStore, IHashManager<uint> rawBlockHashManager)
         {
             if (virtualBlockManager == null)
             {
@@ -47,11 +47,11 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             _virtualBlocksPerBlock = _blockSize / 8;
 
             // now do checks
-            if(_virtualBlockStore.BlockSize != _blockSize)
+            if (_virtualBlockStore.BlockSize != _blockSize)
             {
                 throw new Exception("VirtualBlockStore.BlockSize != RawBlockStore.BlockSize");
             }
-            if(_virtualBlockStore.BlockCount != (virtualBlockCount / _virtualBlocksPerBlock))
+            if (_virtualBlockStore.BlockCount != (virtualBlockCount / _virtualBlocksPerBlock))
             {
                 throw new Exception("VirtualBlockStore.BlockCount != (virtualBlockCount / virtualBlocksPerBlock)");
             }
@@ -65,7 +65,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         private readonly IBlockManager _rawBlockManager;
         private readonly ulong _virtualBlockCount;
         private readonly IUsageCountStore _rawBlockUsageCountStore;
-        private readonly IHashManager _rawBlockHashManager;
+        private readonly IHashManager<uint> _rawBlockHashManager;
 
         private readonly uint _blockSize;
         private readonly uint _virtualBlocksPerBlock;

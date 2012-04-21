@@ -2,45 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
 using System.Threading;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
     partial class DeduplicatingBlockStore
     {
         private readonly ObjectPool<ArraySegment<byte>> _blockBufferPool;
 
         public int MaxDedupCandidates = 0;
+
         public override void Store(ulong index, ArraySegment<byte> buffer)
         {
             CheckDisposed();
             var xCRC = Crc32.Compute(buffer);
             ulong? xAlreadyExistingBlockId = null;
+
             #region find deduplicated block
+
             var xAllBlocksWithSameCRC = _rawBlockHashManager.GetAllBlocksWithCRC32(xCRC);
             var xCandidateBlockBuff = _blockBufferPool.Acquire();
             try
             {
-                unsafe
+                foreach (var xItem in xAllBlocksWithSameCRC)
                 {
-                    fixed (byte* xBlockPtr = &buffer.Array[buffer.Offset])
+                    _rawBlockStore.Retrieve(xItem, xCandidateBlockBuff);
+                    if (CompareBlocks(buffer.Array, xCandidateBlockBuff.Array, buffer.Offset, 0, (int)_blockSize))
                     {
-                        fixed (byte* xCandidateBuffPtr = &xCandidateBlockBuff.Array[0])
-                        {
-                            var xItem = xAllBlocksWithSameCRC.First;
-                            while (xItem != null)
-                            {
-                                var i = xItem.Value;
-                                _rawBlockStore.Retrieve(i, xCandidateBlockBuff);
-                                if (CompareBlocks(xBlockPtr, xCandidateBuffPtr, _blockSize))
-                                {
-                                    xAlreadyExistingBlockId = i;
-                                    break;
-                                }
-                                xItem = xItem.Next;
-                            }
-                        }
+                        xAlreadyExistingBlockId = xItem;
+                        break;
                     }
                 }
             }
@@ -48,7 +39,9 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             {
                 _blockBufferPool.Release(xCandidateBlockBuff);
             }
+
             #endregion find deduplicated block
+
             if (!xAlreadyExistingBlockId.HasValue)
             {
                 xAlreadyExistingBlockId = _rawBlockManager.Reserve();
@@ -101,41 +94,40 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             }
         }
 
-        public static bool CompareBlocks(byte[] buff, byte[] buff2)
+        public static bool CompareBlocks(byte[] buff, byte[] buff2, int buffOffset, int buff2Offset, int length)
         {
-            unsafe
+            if (buff == null)
             {
-                fixed (byte* xBuffPtr = buff)
+                throw new ArgumentNullException("buff");
+            }
+            if (buff2 == null)
+            {
+                throw new ArgumentNullException("buff2");
+            }
+            if (buff.Length >= (buffOffset + length))
+            {
+                throw new ArgumentException("Buffer not long enough!", "buff");
+            }
+            if (buff2.Length >= (buff2Offset + length))
+            {
+                throw new ArgumentException("Buffer not long enough!", "buff");
+            }
+            unchecked
+            {
+                for (int i = 0; i < length; i++)
                 {
-                    fixed (byte* xBuff2Ptr = buff2)
+                    if (buff[buffOffset + i] != buff2[buff2Offset + i])
                     {
-                        return CompareBlocks(xBuffPtr, xBuff2Ptr, (uint)buff.Length);
+                        return false;
                     }
                 }
             }
-        }
-
-        public static unsafe bool CompareBlocks(byte* xBuffPtr, byte* xBlockPtr, uint byteCount)
-        {
-            ulong* xBuffPtrLong = (ulong*)xBuffPtr;
-            ulong* xBlockPtrLong = (ulong*)xBlockPtr;
-
-            bool xMismatch = false;
-            byteCount /= 8;
-            for (int i = 0; i < byteCount; i++)
-            {
-                if (xBlockPtrLong[i] != xBuffPtrLong[i])
-                {
-                    xMismatch = true;
-                    break;
-                }
-            }
-            return !xMismatch;
+            return true;
         }
 
         public override void Retrieve(ulong index, ArraySegment<byte> buffer)
         {
-            if(!IsReserved(index))
+            if (!IsReserved(index))
             {
                 throw new Exception(string.Format("Cannot retrieve a free block! (Block index = {0})", index));
             }

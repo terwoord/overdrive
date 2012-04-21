@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerWoord.OverDriveStorage.Legacy.Implementations;
+using TerWoord.OverDriveStorage.Implementations;
 using TerWoord.OverDriveStorage.Tests.TestUtilities;
 
 namespace TerWoord.OverDriveStorage.Tests.Implementations
@@ -17,9 +17,9 @@ namespace TerWoord.OverDriveStorage.Tests.Implementations
         {
             using (var xMSStore = new MemoryStream(new byte[32768]))
             {
-                using(var xMSBitmap = new MemoryStream(new byte[8]))
+                using (var xMSBitmap = new MemoryStream(new byte[8]))
                 {
-                    using(var xBlockStore = new SimpleStreamBlockStore(xMSStore, 512))
+                    using (var xBlockStore = new SimpleStreamBlockStore(xMSStore, 512))
                     {
                         using (var xBitmapBlockManager = new BitmapBlockManager(xMSBitmap, 1, 8))
                         {
@@ -29,7 +29,6 @@ namespace TerWoord.OverDriveStorage.Tests.Implementations
                             Assert.IsTrue(xBitmapBlockManager.IsReserved(0));
                             xBitmapBlockManager.Free(0);
                             Assert.IsFalse(xBitmapBlockManager.IsReserved(0));
-
                         }
                     }
                 }
@@ -45,14 +44,13 @@ namespace TerWoord.OverDriveStorage.Tests.Implementations
                 {
                     using (var xBlockStore = new SimpleStreamBlockStore(xMSStore, 512))
                     {
-                        using (var xBitmapBlockManager = new BitmapBlockManager(xMSBitmap, 1,8))
+                        using (var xBitmapBlockManager = new BitmapBlockManager(xMSBitmap, 1, 8))
                         {
                             Assert.IsFalse(xBitmapBlockManager.IsReserved(0));
                             var xBit = xBitmapBlockManager.Reserve();
                             Assert.IsTrue(xBitmapBlockManager.IsReserved(xBit));
                             xBitmapBlockManager.Free(xBit);
                             Assert.IsFalse(xBitmapBlockManager.IsReserved(xBit));
-
                         }
                     }
                 }
@@ -60,7 +58,7 @@ namespace TerWoord.OverDriveStorage.Tests.Implementations
         }
 
         [TestMethod]
-        [ExpectedArgumentNullException(Argument="baseStore")]
+        [ExpectedArgumentNullException(Argument = "baseStore")]
         public void Test_ThrowErrorWithEmptyBaseStore()
         {
             using (var xMSBitmap = new MemoryStream(new byte[8]))

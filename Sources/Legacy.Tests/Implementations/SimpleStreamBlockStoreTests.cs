@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerWoord.OverDriveStorage.Legacy.Implementations;
+using TerWoord.OverDriveStorage.Implementations;
 using TerWoord.OverDriveStorage.Tests.TestUtilities;
 
 namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
@@ -15,7 +15,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         [TestMethod]
         public void DoTest()
         {
-            using(var xBackend = new MemoryStream())
+            using (var xBackend = new MemoryStream())
             {
                 xBackend.SetLength(2);
                 var xStore = new SimpleStreamBlockStore(xBackend, 1);
@@ -39,17 +39,17 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         }
 
         [TestMethod]
-        [ExpectedArgumentNullExceptionAttribute(Argument="backend")]
+        [ExpectedArgumentNullExceptionAttribute(Argument = "backend")]
         public void Test_StoreThrowsErrorWithoutBackend()
         {
             IBlockStore xStore = new SimpleStreamBlockStore(null as Stream, 1);
         }
 
         [TestMethod]
-        [ExpectedExceptionMessage(ExceptionType=typeof(Exception), Message = "File size must be multiple of BlockSize!")]
+        [ExpectedExceptionMessage(ExceptionType = typeof(Exception), Message = "File size must be multiple of BlockSize!")]
         public void Test_StoreThrowsErrorWithWrongSize()
         {
-            using(var xMS = new MemoryStream(new byte[2]))
+            using (var xMS = new MemoryStream(new byte[2]))
             {
                 var xStore = new SimpleStreamBlockStore(xMS, 4);
             }

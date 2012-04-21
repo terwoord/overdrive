@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace TerWoord.OverDriveStorage.Legacy.Utilities
+namespace TerWoord.OverDriveStorage.Utilities
 {
     public class BitArray
     {
@@ -19,18 +19,11 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
             Array = new ulong[xCapacity];
             mCount = bytes.Length * 8;
 
-            unsafe
+            unchecked
             {
-                fixed(ulong* xArrayPtr = Array)
+                for (int i = 0; i < xCapacity - 1; i++)
                 {
-                    fixed(byte* xBytesPtr = bytes)
-                    {
-                        var xArrayBytePtr = (byte*)xArrayPtr;
-                        for(int i = 0; i < bytes.Length;i++)
-                        {
-                            xArrayBytePtr[i] = xBytesPtr[i];
-                        }
-                    }
+                    Array[i] = ByteConverter.ReadUInt64(bytes, i * 8);
                 }
             }
         }
@@ -46,7 +39,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
                 var xArrayIdx = index / 64;
                 var xBitIdx = index % 64;
                 var xValue = Array[xArrayIdx];
-                if(value )
+                if (value)
                 {
                     xValue |= 1UL << xBitIdx;
                 }

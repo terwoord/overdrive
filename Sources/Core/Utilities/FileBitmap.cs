@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 using System.IO;
+using System.Linq;
 
-namespace TerWoord.OverDriveStorage.Legacy.Utilities
+namespace TerWoord.OverDriveStorage.Utilities
 {
     public class FileBitmap : IDisposable
     {
@@ -15,23 +15,24 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
                 BytesIsStale = false;
                 IsDirty = false;
             }
+
             public readonly BitArray Bits;
             public readonly byte[] Bytes;
             public bool BytesIsStale = false;
             public bool IsDirty;
         }
+
         private bool mDisposed = false;
         private readonly uint mBlockSize = 512;
         private readonly uint mBlockBitsPerBlock = 512 * 8;
         private readonly ulong mBlockCount;
         private readonly ulong mStoreBlockCount;
         private readonly Stream mBackend;
-        private readonly RecentItemCacheUInt64KeyM<CacheEntry> mCache=new RecentItemCacheUInt64KeyM<CacheEntry>();
+        private readonly SimpleRecentItemCache<CacheEntry> mCache = new SimpleRecentItemCache<CacheEntry>();
 
         public FileBitmap(string file, ulong storageBlockCount, uint blockSize)
             : this(new FileStream(file, FileMode.Open), storageBlockCount, blockSize)
         {
-            
         }
 
         public FileBitmap(Stream stream, ulong storageBlockCount, uint blockSize)
@@ -121,7 +122,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
             }
         }
 
-        
         private ulong mZeroBitScanStartPageIdx = 0;
         private uint mZeroBitScanStartLongIdx = 0;
 
@@ -184,7 +184,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
             var xStoreBlockIdxBase = xStoreBlockIdx * mBlockBitsPerBlock;
 
             var xLongBuffStartScan = 0U;
-            if(xStoreBlockIdx==mZeroBitScanStartPageIdx)
+            if (xStoreBlockIdx == mZeroBitScanStartPageIdx)
             {
                 xLongBuffStartScan = mZeroBitScanStartLongIdx;
                 xLongBuffStartScan = (xLongBuffStartScan / 8) * 8;
@@ -213,7 +213,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Utilities
                         mZeroBitScanStartPageIdx = xStoreBlockIdx;
                         mZeroBitScanStartLongIdx = xLongBuffIdx;
                         firstIndexOfZeroBit = xBitIdx;
-                        if (xBitIdx % mBlockBitsPerBlock == (mBlockBitsPerBlock-1))
+                        if (xBitIdx % mBlockBitsPerBlock == (mBlockBitsPerBlock - 1))
                         {
                             mZeroBitScanStartPageIdx++;
                             mZeroBitScanStartLongIdx = 0;

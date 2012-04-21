@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 
-namespace TerWoord.OverDriveStorage.Legacy
+namespace TerWoord.OverDriveStorage
 {
-    public interface IUsageCountStore: IDisposable
+    public interface IUsageCountStore : IDisposable
     {
         ulong EntryCount
         {
@@ -12,6 +12,7 @@ namespace TerWoord.OverDriveStorage.Legacy
         }
 
         void Increment(ulong index);
+
         void Decrement(ulong index);
 
         bool HasEntriesWhichReachedZero

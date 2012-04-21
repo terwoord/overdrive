@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.IO;
-using System.Xml;
-using System.ComponentModel;
-using ByteConverter = TerWoord.OverDriveStorage.Legacy.ByteConverter;
-using System.Diagnostics;
-using TerWoord.OverDriveStorage;
-using TerWoord.OverDriveStorage.Legacy.Implementations;
 using System.Windows.Forms;
+using System.Xml;
+using TerWoord.OverDriveStorage;
+using TerWoord.OverDriveStorage.Implementations;
+using ByteConverter = TerWoord.OverDriveStorage.Utilities.ByteConverter;
 
 namespace PerfTester
 {
@@ -21,12 +21,13 @@ namespace PerfTester
         private ulong mTotalSizeProcessed;
         private static readonly Guid ConfigId = new Guid("{54124FAE-9CFB-47E3-A487-41FB787DEB5F}");
         private ulong mCurIdx;
+
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-                                                         const string xOutputDir=@"c:\ODSStore";
+            const string xOutputDir = @"c:\ODSStore";
             const uint xStepBlockCount = (10 * 1024 * 1024) / 2048;
-            mCurIdx=0;
-            var xArg=(Tuple<string, bool>)e.Argument;
+            mCurIdx = 0;
+            var xArg = (Tuple<string, bool>)e.Argument;
             var xDir = xArg.Item1;
             if (xArg.Item2)
             {
@@ -37,14 +38,18 @@ namespace PerfTester
             }
 
             mTotalSize = 0;
+
             #region calculate total size
+
             foreach (var xFile in Directory.GetFiles(xDir, "*.*", SearchOption.TopDirectoryOnly))
             {
                 var xFileInfo = new FileInfo(xFile);
                 mTotalSize += (ulong)xFileInfo.Length;
             }
+
             #endregion calculate total size
-            CheckForIllegalCrossThreadCalls =true;
+
+            CheckForIllegalCrossThreadCalls = true;
             bool xCreated;
             var xDedupStore = OpenDedupStoreAndCreateIfNotExist(xOutputDir, out xCreated);
 
@@ -61,6 +66,7 @@ namespace PerfTester
                 if (xCreated)
                 {
                     #region store files
+
                     using (var xConfigWriter = new StreamWriter(Path.Combine(xOutputDir, "Config.xml")))
                     {
                         using (var xConfig = XmlWriter.Create(xConfigWriter))
@@ -126,7 +132,9 @@ namespace PerfTester
                             xConfig.Flush();
                         }
                     }
+
                     #endregion store files
+
                     Console.Write("Flushing all writes...");
                     xSW.Reset();
                     xSW.Start();
@@ -138,7 +146,9 @@ namespace PerfTester
                 else
                 {
                     throw new Exception("Verifying not yet implemented!");
+
                     #region verify data
+
                     //var xFiles = new List<KeyValuePair<Guid, string>>();
                     //using (var xOdbfs = new ODBFSImpl(xDedupStore))
                     //{
@@ -198,6 +208,7 @@ namespace PerfTester
                     //        }
                     //    }
                     //}
+
                     #endregion verify data
                 }
             }
@@ -255,7 +266,7 @@ namespace PerfTester
                 throw new Exception("VirtualBlocks.bin file size mismatch!");
             }
             var xVirtualBlockStore = new SimpleStreamBlockStore(xVirtualBlockStoreFS, BlockSize);
-            
+
             var xRawBlockManagerFS = new FileStream(Path.Combine(dataStoreDir, "RawBlockBitmap.bin"), FileMode.Open);
             if (xRawBlockManagerFS.Length != (long)(xRawBlockStore.BlockCount / 8))
             {
@@ -328,7 +339,6 @@ namespace PerfTester
             //return new ExperimentalDeduplicatingBlockStore(xVirtualBlockManager, xVirtualBlockStoreCache, xRawBlockStore, xRawBlockManager, xVirtualBlockCount, xRawBlockUsageCounter, xHashManager
             //    , Path.Combine(dataStoreDir, "BatchCache"));
             return new DeduplicatingBlockStore(xVirtualBlockManager, xVirtualBlockStore, xRawBlockStore, xRawBlockManager, xVirtualBlockCount, xRawBlockUsageCounter, xHashManager);
-            
         }
     }
 }

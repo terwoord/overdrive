@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
-{               
-    public class SimpleStreamBlockStore: BaseBlockStore
+namespace TerWoord.OverDriveStorage.Implementations
+{
+    public class SimpleStreamBlockStore : BaseBlockStore
     {
         private readonly Stream mBackend;
 
@@ -91,11 +91,11 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
 
         public override void Retrieve(ulong index, ArraySegment<byte> buffer)
         {
-            if(index >=mBlockCount)
+            if (index >= mBlockCount)
             {
                 throw new IndexOutOfRangeException();
             }
-            if(buffer.Count != mBlockSize)
+            if (buffer.Count != mBlockSize)
             {
                 throw new Exception("Buffer is not of correct size");
             }

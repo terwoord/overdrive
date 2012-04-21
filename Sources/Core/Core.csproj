@@ -42,11 +42,24 @@
     <Compile Include="IBlockManager.cs" />
     <Compile Include="IBlockManagingStore.cs" />
     <Compile Include="IBlockStore.cs" />
+    <Compile Include="IHashManager.cs" />
+    <Compile Include="Implementations\BaseBlockStore.cs" />
+    <Compile Include="Implementations\BitmapBlockManager.cs" />
+    <Compile Include="Implementations\DeduplicatingBlockStore.cs" />
+    <Compile Include="Implementations\DeduplicatingBlockStore.Impl.cs" />
+    <Compile Include="Implementations\SimpleHashManager.cs" />
+    <Compile Include="Implementations\SimpleStreamBlockStore.cs" />
+    <Compile Include="Implementations\SimpleUsageCountStore.cs" />
+    <Compile Include="IUsageCountStore.cs" />
+    <Compile Include="Utilities\BitArray.cs" />
+    <Compile Include="Utilities\ByteConverter.cs" />
+    <Compile Include="Utilities\CRC32.cs" />
+    <Compile Include="Utilities\FileBitmap.cs" />
+    <Compile Include="Utilities\ObjectPool.cs" />
     <Compile Include="Utilities\ReaderWriterLocker.cs" />
+    <Compile Include="Utilities\SimpleRecentItemCache.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Implementations\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

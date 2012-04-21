@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
-    public class SimpleUsageCountStore: IUsageCountStore
+    public class SimpleUsageCountStore : IUsageCountStore
     {
         private readonly IBlockStore _backend;
+
         public SimpleUsageCountStore(IBlockStore backend)
         {
             if (backend == null)
@@ -18,17 +19,18 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             _backend = backend;
             _rawBlockUsagesPerBlock = backend.BlockSize / 8;
             _entryCount = backend.BlockCount * 8;
-            _blockBuffPool = new ObjectPool<ArraySegment<byte>>(() =>new ArraySegment<byte>(new byte[_backend.BlockSize]));
+            _blockBuffPool = new ObjectPool<ArraySegment<byte>>(() => new ArraySegment<byte>(new byte[_backend.BlockSize]));
         }
 
         private readonly uint _rawBlockUsagesPerBlock;
         private readonly ulong _entryCount;
         private readonly ObjectPool<ArraySegment<byte>> _blockBuffPool;
-        
+
         private bool _disposed;
+
         public void Dispose()
         {
-            if(_disposed)
+            if (_disposed)
             {
                 return;
             }
@@ -51,7 +53,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             var buff = buffSeg.Array;
             try
             {
-
                 var blockUsagePage = index / _rawBlockUsagesPerBlock;
                 var blockUsagePageOffset = (index % _rawBlockUsagesPerBlock) * 8;
 
@@ -80,7 +81,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             var buff = buffSeg.Array;
             try
             {
-
                 var blockUsagePage = index / _rawBlockUsagesPerBlock;
                 var blockUsagePageOffset = (index % _rawBlockUsagesPerBlock) * 8;
 
@@ -105,7 +105,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
             }
         }
 
-        private readonly List<ulong> _entriesWhichReachedZero=new List<ulong>(128); 
+        private readonly List<ulong> _entriesWhichReachedZero = new List<ulong>(128);
 
         public bool HasEntriesWhichReachedZero
         {
@@ -133,6 +133,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         }
 
         private string mId;
+
         public string Id
         {
             get

@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TerWoord.OverDriveStorage.Legacy.Utilities;
+using TerWoord.OverDriveStorage.Utilities;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
-    public class BitmapBlockManager: IBlockManager
+    public class BitmapBlockManager : IBlockManager
     {
         private readonly FileBitmap mBitmap;
 
@@ -44,7 +44,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
                 throw new ArgumentNullException("bitmap");
             }
             var xExpectedBitmapSize = ((baseStore.BlockCount * baseStore.BlockSize) / 8U);
-            if((ulong)bitmap.Length != xExpectedBitmapSize)
+            if ((ulong)bitmap.Length != xExpectedBitmapSize)
             {
                 throw new Exception(string.Format("Wrong Bitmap stream size! (Expected = {0}, Actual = {1})", xExpectedBitmapSize, bitmap.Length));
             }
@@ -59,9 +59,10 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         }
 
         private bool mDisposed;
+
         public void Dispose()
         {
-            if(mDisposed)
+            if (mDisposed)
             {
                 return;
             }
@@ -83,7 +84,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         public ulong[] Reserve(int count)
         {
             var xResult = new ulong[count];
-            for(int i = 0; i < count;i++)
+            for (int i = 0; i < count; i++)
             {
                 xResult[i] = Reserve();
             }
@@ -111,6 +112,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         }
 
         private string mId;
+
         public string Id
         {
             get
@@ -126,7 +128,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
 
         public void Flush()
         {
-
         }
     }
 }

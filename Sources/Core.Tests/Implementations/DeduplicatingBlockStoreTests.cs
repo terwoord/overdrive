@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerWoord.OverDriveStorage.Legacy.Implementations;
+using TerWoord.OverDriveStorage.Implementations;
 
-namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
+namespace TerWoord.OverDriveStorage.Tests.Implementations
 {
     [TestClass]
     public class DeduplicatingBlockStoreTests
@@ -32,7 +31,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
 
                 Assert.IsTrue(mRawBlockManager.IsReserved(0));
                 Assert.IsFalse(mRawBlockManager.IsReserved(1));
-                
             }
         }
 
@@ -41,7 +39,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         {
             using (var xStore = CreateStore(2048, 32768, 32768))
             {
-
             }
         }
 
@@ -50,7 +47,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
         {
             using (var xStore = CreateStore(512, 32768, 32768))
             {
-
             }
         }
 
@@ -76,7 +72,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
             var xRawBlockManagerFS = new FileStream(Path.Combine(xBaseDir, "RawBlockBitmap.bin"), FileMode.CreateNew);
             xRawBlockManagerFS.SetLength((long)(xRawBlockStore.BlockCount / 8));
             mRawBlockManager = new BitmapBlockManager(xRawBlockManagerFS, (ulong)(xRawBlockManagerFS.Length / blockSize), blockSize);
-            
+
             var xVirtualBlockManagerFS = new FileStream(Path.Combine(xBaseDir, "VirtualBlocksBitmap.bin"), FileMode.CreateNew);
             xVirtualBlockManagerFS.SetLength((long)(virtualBlockCount / 8));
             var xVirtualBlockManager = new BitmapBlockManager(xVirtualBlockManagerFS, virtualBlockCount / blockSize / 8, blockSize);
@@ -93,7 +89,6 @@ namespace TerWoord.OverDriveStorage.Legacy.Tests.Implementations
             var xHashesDir = Path.Combine(xBaseDir, "Hashes");
             SimpleHashManager.Create(xHashesDir);
             var xHashManager = new SimpleHashManager(xHashesDir);
-
 
             return new DeduplicatingBlockStore(xVirtualBlockManager, xVirtualBlockStore, xRawBlockStore, mRawBlockManager, virtualBlockCount,
                 xRawBlockUsageCounter, xHashManager);

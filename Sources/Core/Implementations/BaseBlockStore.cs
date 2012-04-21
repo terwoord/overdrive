@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace TerWoord.OverDriveStorage.Legacy.Implementations
+namespace TerWoord.OverDriveStorage.Implementations
 {
-    public abstract class BaseBlockStore: IBlockStore
+    public abstract class BaseBlockStore : IBlockStore
     {
         private bool _disposed = false;
+
         protected bool IsDisposed
         {
             get
@@ -16,10 +17,9 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
                 return _disposed;
             }
         }
-        
+
         protected virtual void DoDispose()
         {
-            
         }
 
         protected void CheckDisposed()
@@ -32,7 +32,7 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
 
         public void Dispose()
         {
-            if(_disposed)
+            if (_disposed)
             {
                 return;
             }
@@ -46,11 +46,11 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         public virtual void Store(ulong[] indices, ArraySegment<byte> buffer)
         {
             CheckDisposed();
-            if(buffer.Count!=(indices.Length*BlockSize))
+            if (buffer.Count != (indices.Length * BlockSize))
             {
                 throw new Exception("Buffer size not correct!");
             }
-            for(int i = 0; i < indices.Length;i++)
+            for (int i = 0; i < indices.Length; i++)
             {
                 Store(indices[i], new ArraySegment<byte>(buffer.Array, (int)(buffer.Offset + (i * BlockSize)), (int)BlockSize));
             }
@@ -82,9 +82,9 @@ namespace TerWoord.OverDriveStorage.Legacy.Implementations
         }
 
         public abstract void DumpCacheInfo(StreamWriter output, string linePrefix);
+
         public virtual void PreloadCaches()
         {
-
         }
 
         public virtual string Id
