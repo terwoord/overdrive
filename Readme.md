@@ -21,10 +21,6 @@ presents with a way to easily perform duplication of blocks. No caching is curre
 
 The following things will get published coming weeks and months:
 * ODBFS: the Overdrive Filesystem. Allows splitting up one blockstore in multiple logical volumes.
-* Caching constructs: 
-    * ReadCachingBlockStore: A block store caching X most recent blocks, writing immediately
-	* ReadWriteCachingBlockStore: A block store caching X most recent blocks, writing when
-	blocks gets removed from cache
 
 # Roadmap 
 
@@ -36,6 +32,7 @@ Some plans are already clear, and those have been divided into longer and shorte
 we can dramatically improve the write performance. Right now, a single write takes 5 writes (worst-case).
 This can be brought back to 2 at most, by the use of delayed writing, while still staying safe for data corruption.
 * Documentation
+* Safe opening of stores. 
 
 ## Longer term
 

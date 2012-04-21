@@ -340,7 +340,8 @@ namespace PerfTester
             var xRawBlockUsageCounterFS = new FileStream(Path.Combine(dataStoreDir, "RawBlockUsageCounts.bin"), FileMode.Create);
             xRawBlockUsageCounterFS.SetLength((long)(xRawBlockStore.BlockCount * 8));
             var xRawBlockUsageCounterStore = new SimpleStreamBlockStore(xRawBlockUsageCounterFS, BlockSize);
-            var xRawBlockUsageCounter = new SimpleUsageCountStore(xRawBlockUsageCounterStore);
+            var xRawBlockUsageCounterStoreCache = new SimpleReadWriteCachingBlockStore(xRawBlockUsageCounterStore, 1024);
+            var xRawBlockUsageCounter = new SimpleUsageCountStore(xRawBlockUsageCounterStoreCache);
 
             SimpleHashManager.Create(Path.Combine(dataStoreDir, "Hashes"));
             var xHashManager = new SimpleHashManager(Path.Combine(dataStoreDir, "Hashes"));
