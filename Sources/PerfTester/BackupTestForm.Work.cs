@@ -37,17 +37,6 @@ namespace PerfTester
                 }
             }
 
-            mTotalSize = 0;
-
-            #region calculate total size
-
-            foreach (var xFile in Directory.GetFiles(xDir, "*.*", SearchOption.TopDirectoryOnly))
-            {
-                var xFileInfo = new FileInfo(xFile);
-                mTotalSize += (ulong)xFileInfo.Length;
-            }
-
-            #endregion calculate total size
 
             CheckForIllegalCrossThreadCalls = true;
             bool xCreated;
@@ -55,6 +44,25 @@ namespace PerfTester
 
             using (xDedupStore)
             {
+                mTotalSize = 0;
+                var xTotalBlocks = 0L;
+
+                #region calculate total size
+
+                foreach (var xFile in Directory.GetFiles(xDir, "*.*", SearchOption.TopDirectoryOnly))
+                {
+                    var xFileInfo = new FileInfo(xFile);
+                    mTotalSize += (ulong)xFileInfo.Length;
+                    xTotalBlocks += xFileInfo.Length / xDedupStore.BlockSize;
+                    if (xFileInfo.Length % xDedupStore.BlockSize != 0)
+                    {
+                        xTotalBlocks++;
+                    }
+                }
+
+                #endregion calculate total size
+
+
                 Console.Write("Preloading caches...");
                 var xSW = new Stopwatch();
                 xSW.Start();
@@ -93,7 +101,6 @@ namespace PerfTester
                                     while (xFS.Position < xFS.Length)
                                     {
                                         var xRead = xFS.Read(xBuff, 0, xBuff.Length);
-                                        mTotalSize += (ulong)xRead;
                                         if (xRead != xBuff.Length)
                                         {
                                             if (xFS.Position != xFS.Length)
@@ -110,10 +117,14 @@ namespace PerfTester
                                         {
                                             xSW.Stop();
                                             mQueuedStats.Enqueue(new Tuple<ulong, double>(mCurIdx, xSW.Elapsed.TotalSeconds));
-                                            var xProgress = Math.Round((mTotalSize / (double)mTotalSizeProcessed) * 100);
+                                            var xProgress = Math.Round((xCurrentBlock / (double)xTotalBlocks) * 100);
                                             if (double.IsInfinity(xProgress) || double.IsNaN(xProgress))
                                             {
                                                 xProgress = 0;
+                                            }
+                                            else if (xProgress > 100)
+                                            {
+                                                xProgress = 100;
                                             }
                                             backgroundWorker.ReportProgress((int)xProgress);
                                             mTotalSeconds += xSW.Elapsed.TotalSeconds;

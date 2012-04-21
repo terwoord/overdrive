@@ -45,9 +45,12 @@
     <Compile Include="IHashManager.cs" />
     <Compile Include="Implementations\BaseBlockStore.cs" />
     <Compile Include="Implementations\BitmapBlockManager.cs" />
+    <Compile Include="Implementations\BlockDividingBlockStore.cs" />
     <Compile Include="Implementations\DeduplicatingBlockStore.cs" />
     <Compile Include="Implementations\DeduplicatingBlockStore.Impl.cs" />
     <Compile Include="Implementations\SimpleHashManager.cs" />
+    <Compile Include="Implementations\SimpleReadCachingBlockStore.cs" />
+    <Compile Include="Implementations\SimpleReadWriteCachingBlockStore.cs" />
     <Compile Include="Implementations\SimpleStreamBlockStore.cs" />
     <Compile Include="Implementations\SimpleUsageCountStore.cs" />
     <Compile Include="IUsageCountStore.cs" />
