@@ -12,9 +12,9 @@ Overdrive is a library implementing deduplicated storage. It does this by provid
 to use interface, which presents a easy way read and write to a store and will be able to 
 reach high performance deduplication.
 
-This basically means that it lets a developer store fixed-size blocks in a store, while transparently
-deduplicating, to prevent sharing double data. The library is intended to be used by other projects,
-to provide a means to open stores, and use them. 
+It lets a developer save and retrieve fixed-size blocks in a store, while transparently 
+deduplicating those blocks. No double data is being stored. The library is intended to be 
+used by other projects, to provide a means to open stores, and use them.
 
 Overdrive aims to help developers implement deduplication techniques, similar to the ones found in ZFS 
 and Windows Server 2012 in their own software, while not having the full knowledge required to implement 
@@ -51,7 +51,7 @@ Dokan (http://dokan-dev.net/en/) or as backend for some iSCSI target library.
 
 # License
 
-Copyright (c) 2007-2008, The OverDrive Storage Project
+Copyright (c) 2011-2012, The OverDrive Storage Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted 
