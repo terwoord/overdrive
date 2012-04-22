@@ -2,7 +2,6 @@ In this file:
 
 * Introduction
 * What is the current state of the project
-* What is going to be committed soon
 * Roadmap
 * License
 
@@ -24,11 +23,6 @@ those techniques.
 
 Currently the library works, although the performance is less than ideal. The DeduplicatingBlockStore 
 presents with a way to easily perform duplication of blocks. No caching is currently being done.
-
-# What will be committed soon?
-
-The following things will get published coming weeks and months:
-* ODBFS: the Overdrive Filesystem. Allows splitting up one blockstore in multiple logical volumes.
 
 # Roadmap 
 
