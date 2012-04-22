@@ -44,9 +44,9 @@ This can be brought back to 2 at most, by the use of delayed writing, while stil
 
 ## Longer term
 
-* Make everything thread-safe. Right now, everything is thread-safe, as long as it's used exclusively by 
-one thread at a time. Making the project multithreaded, opens lots of uses, for example when combined with
-Dokan (http://dokan-dev.net/en/) or as backend for some iSCSI target library.
+* Make everything thread-safe. Right now, the library is not thread-safe. Making the project multithreaded, 
+opens lots of uses, for example when combined with Dokan (http://dokan-dev.net/en/) or as backend for 
+some iSCSI target library.
 * more performance improvements by using more sophisticated algorithms.
 
 # License
