@@ -12,6 +12,14 @@ Overdrive is a library implementing deduplicated storage. It does this by provid
 to use interface, which presents a easy way read and write to a store and will be able to 
 reach high performance deduplication.
 
+This basically means that it lets a developer store fixed-size blocks in a store, while transparently
+deduplicating, to prevent sharing double data. The library is intended to be used by other projects,
+to provide a means to open stores, and use them. 
+
+Overdrive aims to help developers implement deduplication techniques, similar to the ones found in ZFS 
+and Windows Server 2012 in their own software, while not having the full knowledge required to implement 
+those techniques.
+
 # What is the current state of the project?
 
 Currently the library works, although the performance is less than ideal. The DeduplicatingBlockStore 
