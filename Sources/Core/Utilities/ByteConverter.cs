@@ -40,38 +40,44 @@ namespace TerWoord.OverDriveStorage.Utilities
                 buffer[offset+5] = (byte)(value >> 40);
                 buffer[offset+6] = (byte)(value >> 48);
                 buffer[offset+7] = (byte)(value >> 56);
-                //    return buffer[offset + 7]
-                //        | (buffer[offset + 6] << 8)
-                //        | (buffer[offset + 5] << 16)
-                //        | (buffer[offset + 4] << 24)
-                //        | (buffer[offset + 3] << 32)
-                //        | (buffer[offset + 2] << 40)
-                //        | (buffer[offset + 1] << 48)
-                //        | (buffer[offset] << 54);
             }
         }
 
-        //public unsafe static uint ReadUInt32(byte[] buffer, int offset)
-        //{
-        //    fixed (byte* fixedBuffer = &buffer[offset])
-        //    {
-        //        uint* destination = (uint*)(fixedBuffer);
-        //        return *destination;
+        public static uint ReadUInt32(byte[] buffer, int offset)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+            if (buffer.Length < (offset + 4))
+            {
+                throw new ArgumentException("Not enough data", "buffer");
+            }
+            unchecked
+            {
+                return (uint)((buffer[offset + 3] << 24)
+                    | (buffer[offset + 2] << 16)
+                    | (buffer[offset + 1] << 8)
+                    | (buffer[offset]));
+            }
+        } // function
 
-        //    } // fixed
-
-        //} // function
-
-        //public unsafe static ushort ReadUInt16(byte[] buffer, int offset)
-        //{
-        //    fixed (byte* fixedBuffer = &buffer[offset])
-        //    {
-        //        var destination = (ushort*)(fixedBuffer);
-        //        return *destination;
-
-        //    } // fixed
-
-        //} // function
+        public static ushort ReadUInt16(byte[] buffer, int offset)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+            if (buffer.Length < (offset + 4))
+            {
+                throw new ArgumentException("Not enough data", "buffer");
+            }
+            unchecked
+            {
+                return (ushort)((buffer[offset + 1] << 8)
+                    | (buffer[offset]));
+            }
+        } // function
 
         public static ulong ReadUInt64(byte[] buffer, int offset)
         {
@@ -98,16 +104,16 @@ namespace TerWoord.OverDriveStorage.Utilities
             }
         } // function
 
-        //public static Guid ReadGuid(byte[] buffer, int offset)
-        //{
-        //    var xBuff = new byte[16];
-        //    Buffer.BlockCopy(buffer, offset, xBuff, 0, 16);
-        //    return new Guid(xBuff);
-        //}
+        public static Guid ReadGuid(byte[] buffer, int offset)
+        {
+            var xBuff = new byte[16];
+            Buffer.BlockCopy(buffer, offset, xBuff, 0, 16);
+            return new Guid(xBuff);
+        }
 
-        //public static void WriteBytes(Guid value, byte[] buffer, int offset)
-        //{
-        //    Buffer.BlockCopy(value.ToByteArray(), 0, buffer, offset, 16);
-        //}
+        public static void WriteBytes(Guid value, byte[] buffer, int offset)
+        {
+            Buffer.BlockCopy(value.ToByteArray(), 0, buffer, offset, 16);
+        }
     } // class
 } // namespace

@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Implementations\BaseBlockStoreTests.cs" />
     <Compile Include="Implementations\DeduplicatingBlockStoreTests.cs" />
+    <Compile Include="Implementations\ODBFS\SimpleSinglePartTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtilities\ExpectedArgumentNullExceptionAttribute.cs" />
     <Compile Include="TestUtilities\ExpectedExceptionMessageAttribute.cs" />

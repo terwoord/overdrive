@@ -1,0 +1,91 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title></title>
+        <style>
+        table
+        {
+            border: 1px solid gray;
+        }
+        </style>
+	</head>
+	<body>
+	    <p>
+            The first block of the filesystem starts with the so-called Supermeta 
+            header. After the SuperMeta Header comes a MetaGroupHeader, and the rest of the logical block is filled with MetaGroup items.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">SuperMeta Header</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Size (bytes)</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Magic bytes (= 0x0DBF5001)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>BlockSize</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">MetaGroup Header</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Size (bytes)</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>BlockNumber of next MetaGroup</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">MetaGroup item</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Size (bytes)</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>VBlockId</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Total number of parts of this VBlock.</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Part index number of this MetaGroupItem</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>BlockNumber of first datablock of this part</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Number of blocks in this part</td>
+                </tr>
+            </tbody>
+        </table>
+	</body>
+</html>

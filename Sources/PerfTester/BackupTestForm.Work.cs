@@ -16,6 +16,7 @@ namespace PerfTester
 {
     partial class BackupTestForm
     {
+        private const uint blockSize = 4096;
         private double mTotalSeconds;
         private ulong mTotalSize;
         private ulong mTotalSizeProcessed;
@@ -25,7 +26,7 @@ namespace PerfTester
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             const string xOutputDir = @"c:\ODSStore";
-            const uint xStepBlockCount = (10 * 1024 * 1024) / 2048;
+            const uint xStepBlockCount = (10 * 1024 * 1024) / blockSize;
             mCurIdx = 0;
             var xArg = (Tuple<string, bool>)e.Argument;
             var xDir = xArg.Item1;
@@ -237,7 +238,7 @@ namespace PerfTester
             {
                 return OpenDedupStore(dataStoreDir);
                 //var xFS = new FileStream(Path.Combine(dataStoreDir, "data.bin"), FileMode.Open);
-                //return new SimpleStreamBlockStore(xFS, 2048);
+                //return new SimpleStreamBlockStore(xFS, blockSize);
             }
             else
             {
@@ -246,14 +247,14 @@ namespace PerfTester
                 return CreateDedupStore(dataStoreDir);
                 //var xFS = new FileStream(Path.Combine(dataStoreDir, "data.bin"), FileMode.Create);
                 //xFS.SetLength(1 * 1024 * 1024 * 1024L);
-                //return new SimpleStreamBlockStore(xFS, 2048);
+                //return new SimpleStreamBlockStore(xFS, blockSize);
             }
         }
 
         private static IBlockManagingStore OpenDedupStore(string dataStoreDir)
         {
             // for now hardcode these values
-            const uint BlockSize = 2048;
+            const uint BlockSize = blockSize;
             long StoreSize = 6 * 1024 * 1024 * 1024L;
             if (Environment.MachineName.Equals("tw-vms1", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -303,7 +304,7 @@ namespace PerfTester
 
         private static IBlockManagingStore CreateDedupStore(string dataStoreDir)
         {
-            const uint BlockSize = 2048;
+            const uint BlockSize = blockSize;
             long StoreSize = 6 * 1024 * 1024 * 1024L;
             if (Environment.MachineName.Equals("tw-vms1", StringComparison.InvariantCultureIgnoreCase))
             {
