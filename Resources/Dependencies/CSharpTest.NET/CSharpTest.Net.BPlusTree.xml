@@ -1,0 +1,779 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CSharpTest.Net.BPlusTree</name>
+    </assembly>
+    <members>
+        <member name="T:CSharpTest.Net.Collections.StorageType">
+            <summary> Defines the storage type to use </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.StorageType.Memory">
+            <summary> Uses in-memory storage </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.StorageType.Disk">
+            <summary> Uses a file to store data, (Set by setting the FileName property) </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.StorageType.Custom">
+            <summary> Uses a custom data store, (Set by setting the StorageSystem property) </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.CreatePolicy">
+            <summary> Determines if the file specified should be created </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CreatePolicy.Never">
+            <summary> Does not create a new file </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CreatePolicy.Always">
+            <summary> Creates a new file even if one already exists </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CreatePolicy.IfNeeded">
+            <summary> Creates a new file only if it does not exist </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.CachePolicy">
+            <summary> Determines the type of node caching used in the tree </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CachePolicy.None">
+            <summary> Does not cache, allways loads from storage. </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CachePolicy.All">
+            <summary> Keeps every loaded object in memory. </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.CachePolicy.Recent">
+            <summary> Keeps a history of objects in memory (see CacheKeepAliveXXX properties) </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2">
+            <summary>
+            Implements an IDictionary interface for a simple file-based database
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.#ctor(CSharpTest.Net.Collections.BPlusTree{`0,`1}.Options)">
+            <summary>
+            Constructs a BPlusTree
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Dispose">
+            <summary>
+            Closes the storage and clears memory used by the instance
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.EnableCount">
+            <summary> 
+            Due to the cost of upkeep, this must be enable each time the object is created via a call to
+            EnableCount() which itself must be done before any writer threads are active for it to be
+            accurate.  This requires that the entire tree be loaded (sequentially) in order to build
+            the initial working count.  Once completed, members like Add() and Remove() will keep the
+            initial count accurate.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.UnloadCache">
+            <summary>
+            Safely removes all items from the in-memory cache.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.ContainsKey(`0)">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.TryGetValue(`0,`1@)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Update(`0,`1)">
+            <summary>
+            Modify the value associated with the specified key.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Update(`0,System.Converter{`1,`1})">
+            <summary>
+            Modify the value associated with the result of the provided update method
+            as an atomic operation, Allows for reading/writing a single record within
+            the tree lock.  Be cautious about the behavior and performance of the code 
+            provided as it can cause a dead-lock to occur.  If the method returns an
+            instance who .Equals the original, no update is applied.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Add(`0,`1)">
+            <summary>
+            Adds an element with the provided key and value to the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.AddOrUpdate(`0,`1)">
+            <summary>
+            Adds or modifies an element with the provided key and value.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Remove(`0)">
+            <summary>
+            Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.CopyTo(System.Collections.Generic.KeyValuePair{`0,`1}[],System.Int32)">
+            <summary>
+            Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Clear">
+            <summary>
+            Removes all items from the collection and permanently destroys all storage.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.DebugSetOutput(System.IO.TextWriter)">
+            <summary>
+            Sets a text writter that the entire btree will be dumped to after every read/write/seek operation.
+            The format is a single line of text in abbreviated form: {k1{k1,k2,k3},k4{k4,k5}}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.DebugSetValidateOnCheckpoint(System.Boolean)">
+            <summary>
+            Sets a boolean condition that will validate the state of the entire btree after every operation.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Print(System.IO.TextWriter,CSharpTest.Net.Collections.BPlusTree{`0,`1}.DebugFormat)">
+            <summary>
+            Prints the entire tree to the text writer
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Validate">
+            <summary>
+            Forces a top-down, depth-first, crawl of the entire tree in which every node and
+            every link or key is checked for accuracy.  Throws on error.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.RecoverFile(CSharpTest.Net.Collections.BPlusTree{`0,`1}.Options)">
+            <summary>
+            Recovers as much file content as possible into a newly created <see cref="T:CSharpTest.Net.Collections.BPlusTree`2"/>, if the operation returns
+            a non-zero result it was successful and the file has been replaced with a new database containing
+            the recovered data.  The original file remains in-tact but was renamed with a '.deleted' extension.
+            </summary>
+            <remarks> 
+            If an exception occurs during the parsing of the file and one or more records were recovered, they will
+            be stored in a file by the same name with an added extension of '.recovered'.  This recovered file can be
+            opened as a normal <see cref="T:CSharpTest.Net.Collections.BPlusTree`2"/> to view it's contents.  During the restore it is possible that
+            a single Key was found multiple times, in this case the first occurrence found will be used.
+            </remarks>
+            <param name="options"> The options normally used to create the <see cref="T:CSharpTest.Net.Collections.BPlusTree`2"/> instance </param>
+            <returns>Returns 0 on failure, or the number of records successfully retrieved from the original file </returns>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.RecoveryScan(CSharpTest.Net.Collections.BPlusTree{`0,`1}.Options,System.IO.FileShare)">
+            <summary>
+            Performs a low-level scan of the storage file to yield all Key/Value pairs it was able to read from the file.
+            </summary>
+            <param name="options"> The options normally used to create the <see cref="T:CSharpTest.Net.Collections.BPlusTree`2"/> instance </param>
+            <param name="sharing"> <see cref="T:System.IO.FileShare"/> options used to open the file </param>
+            <returns> Yields the Key/Value pairs found in the file </returns>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.CallLevelLock">
+            <summary>
+            Defines the lock used to provide tree-level exclusive operations.  This should be set at the time of construction, or not at all since
+            operations depending on this (Clear, EnableCount, and UnloadCache) may behave poorly if operations that started prior to setting this
+            value are still being processed.  Out of the locks I've tested the ReaderWriterLocking implementation performs best here since it is
+            a highly read-intensive lock.  All public APIs that access tree content will aquire this lock as a reader except the three exclusive 
+            operations mentioned above.  This allows you to gain exclusive access and perform mass updates, atomic enumeration, etc.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Count">
+            <summary> See comments on EnableCount() for usage of this property </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Item(`0)">
+            <summary>
+            Gets or sets the element with the specified key.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Keys">
+            <summary>
+            Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Values">
+            <summary>
+            Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.Options">
+            <summary>
+            Defines the options nessessary to construct a BPlusTree implementation
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Options.#ctor(CSharpTest.Net.Serialization.ISerializer{`0},CSharpTest.Net.Serialization.ISerializer{`1})">
+            <summary>
+            Constructs the options configuration to initialize a BPlusTree instance using the default Comparer for TKey
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Options.#ctor(CSharpTest.Net.Serialization.ISerializer{`0},CSharpTest.Net.Serialization.ISerializer{`1},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Constructs the options configuration to initialize a BPlusTree instance
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Options.CreateStorage">
+            <summary> Used to create the correct storage type </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Options.CalcBTreeOrder(System.Int32,System.Int32)">
+            <summary>
+            Calculates default node-threasholds based upon the average number of bytes in key and value
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Options.Clone">
+            <summary>
+            Creates a shallow clone of the configuration options.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.KeySerializer">
+            <summary> Accesses the key serializer given to the constructor </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.ValueSerializer">
+            <summary> Accesses the key serializer given to the constructor </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.KeyComparer">
+            <summary> Defines a custom IComparer&lt;T> to be used for comparing keys </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.StorageType">
+            <summary> 
+            Can be used to explicitly specify the storage type, or by simply providing a file name this
+            will be done for you.  If no file name was specified the default is to use a memory store.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.ReadOnly">
+            <summary>
+            Sets the BTree into a read-only mode (only supported when opening an existing file)
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.StorageSystem">
+            <summary>
+            Sets the custom implementation of the storage back-end to use for the BTree
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FileName">
+            <summary>
+            Gets or sets the FileName that should be used to store the BTree
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CreateFile">
+            <summary>
+            Gets or sets the file-create policy used when backing with a file storage
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FileBlockSize">
+            <summary>
+            Gets or sets the number of bytes per file-block used in the file storage
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FileGrowthRate">
+            <summary>
+            Gets or sets the number of blocks that a file will grow by when all blocks are used, use zero for incremental growth
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FileOpenOptions">
+            <summary>
+            Gets or sets the number of bytes per file-block used in the file storage
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.ConcurrentWriters">
+            <summary>
+            Gets or sets the number of streams that will be created for threads to write in the file store
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.SerializeInMemory">
+            <summary>
+            Enables the memory-based storage system to use serialization just as the file storage would.
+            Provides a 'Simulation mode' while remainning in memory.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.LockTimeout">
+            <summary>
+            Gets or sets the number of milliseconds to wait before failing a lock request, the default
+            of two minutes should be more than adequate.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.LockingFactory">
+            <summary>
+            Gets or sets the locking factory to use for accessing shared data. The default is WriterOnlyLocking() 
+            which does not perform read locks, rather it will rely on the cache of the btree and may preform dirty
+            reads.  You can use any implementation of ILockFactory; however, the SimpleReadWriteLocking seems to 
+            perform the most efficiently for both reader/writer locks.  Additionally wrapping that instance in a
+            ReserveredWriterLocking() instance will allow reads to continue up until a writer begins the commit
+            process.  If you are only accessing the BTree instance from a single thread this can be set to 
+            IgnoreLocking. Be careful of using ReaderWriterLocking as the write-intesive nature of the BTree will 
+            suffer extreme performance penalties with this lock.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CallLevelLock">
+            <summary>
+            Defines a reader/writer lock that used to control exclusive tree access when needed.  The public
+            methods for EnableCount(), Clear(), and UnloadCache() each acquire an exclusive (write) lock while
+            all other public methods acquire a shared (read) lock.  By default this lock is non-operational
+            (an instance of IgnoreLocking) so if you need the above methods to work while multiple threads are
+            accessing the tree, or if you exclusive access to the tree, specify a lock instance.  Since this
+            lock is primarily a read-heavy lock consider using the ReaderWriterLocking or SimpleReadWriteLocking.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.BTreeOrder">
+            <summary>
+            A quick means of setting all the min/max values for the node counts using this value as a basis
+            for the Maximum fields and one-quarter of this value for Minimum fields provided the result is in
+            range.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.MinimumChildNodes">
+            <summary>
+            The smallest number of child nodes that should be linked to before refactoring the tree to remove
+            this node.  In a 'normal' and/or purest B+Tree this is always half of max; however for performance
+            reasons this B+Tree allow any value equal to or less than half of max but at least 2.
+            </summary>
+            <value>A number in the range of 2 to 128 that is at most half of MaximumChildNodes.</value>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.MaximumChildNodes">
+            <summary>
+            The largest number of child nodes that should be linked to before refactoring the tree to split
+            this node into two.  This property has a side-effect on MinimumChildNodes to ensure that it continues
+            to be at most half of MaximumChildNodes.
+            </summary>
+            <value>A number in the range of 4 to 256.</value>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.MinimumValueNodes">
+            <summary>
+            The smallest number of values that should be contained in this node before refactoring the tree to remove
+            this node.  In a 'normal' and/or purest B+Tree this is always half of max; however for performance
+            reasons this B+Tree allow any value equal to or less than half of max but at least 2.
+            </summary>
+            <value>A number in the range of 2 to 128 that is at most half of MaximumValueNodes.</value>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.MaximumValueNodes">
+            <summary>
+            The largest number of values that should be contained in this node before refactoring the tree to split
+            this node into two.  This property has a side-effect on MinimumValueNodes to ensure that it continues
+            to be at most half of MaximumValueNodes.
+            </summary>
+            <value>A number in the range of 4 to 256.</value>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FillChildNodes">
+            <summary> The desired fill-size of node that contain children </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.FillValueNodes">
+            <summary> The desired fill-size of node that contain values </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CachePolicy">
+            <summary>
+            Determines how long loaded nodes stay in memory, Full keeps all loaded nodes alive and is the
+            most efficient, The default Recent keeps recently visited nodes alive based on the CacheKeepAlive
+            properties, and None does not cache the nodes at all but does maintain a cache of locks for 
+            each node visited.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CacheKeepAliveMinimumHistory">
+            <summary> 
+            Determins minimum number of recently visited nodes to keep alive in memory.  This number defines
+            the history size, not the number of distinct nodes.  This number will always be kept reguardless
+            of the timeout.  Specify a value of 0 to allow the timeout to empty the cache.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CacheKeepAliveMaximumHistory">
+            <summary> 
+            Determins maximum number of recently visited nodes to keep alive in memory.  This number defines
+            the history size, not the number of distinct nodes.  The ceiling is always respected reguardless
+            of the timeout.  Specify a value of 0 to disable history keep alive.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Collections.BPlusTree`2.Options.CacheKeepAliveTimeout">
+            <summary>
+            If the cache contains more that CacheKeepAliveMinimumHistory items, this timeout will start to
+            remove those items until the cache history is reduced to CacheKeepAliveMinimumHistory.  It is 
+            important to know that the BPlusTree itself contains no theads and this timeout will not be 
+            respected if cache is not in use.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.DebugFormat">
+            <summary> Print formatting for nodes </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.BPlusTree`2.DebugFormat.Full">
+            <summary> Full information for all nodes </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.BPlusTree`2.DebugFormat.Formatted">
+            <summary> Formatted new lines and tabbify, but reduced information </summary>
+        </member>
+        <member name="F:CSharpTest.Net.Collections.BPlusTree`2.DebugFormat.Compact">
+            <summary> Compact single line format </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.NodeCacheBase">
+            <summary> Provides base functionality of a node cache, not much exciting here </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.NodeCacheFull">
+            <summary> performs a perfect cache of the entire tree </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.NodeCacheNone">
+            <summary> performs a perfect cache of the entire tree </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.BPlusTree`2.Node.CopyTo(CSharpTest.Net.Collections.BPlusTree{`0,`1}.Element[],System.Int32@)">
+            <summary> For enumeration </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.BPlusTree`2.NodeCacheNormal">
+            <summary>
+            This is the default cache type, uses weakreferences and the GC to collect unused nodes after they exit
+            the ObjectKeepAlive containment policy.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.BaseAssertionException">
+            <summary> The base class for BPlutTree runtime assertions </summary>
+        </member>
+        <member name="M:CSharpTest.Net.BaseAssertionException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary> The base class for BPlutTree runtime assertions </summary>
+        </member>
+        <member name="M:CSharpTest.Net.BaseAssertionException.#ctor(System.String)">
+            <summary> The base class for BPlutTree runtime assertions </summary>
+        </member>
+        <member name="M:CSharpTest.Net.BaseAssertionException.#ctor(System.String,System.Exception)">
+            <summary> The base class for BPlutTree runtime assertions </summary>
+        </member>
+        <member name="T:CSharpTest.Net.AssertionFailedException">
+            <summary>
+            Exception class: AssertionFailedException
+            A runtime assertion failed while performing the operation.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.Assert(System.Boolean,System.String,System.Object[])">
+            <summary>
+            if(condition == false) throws A runtime assertion failed: {0}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialization constructor
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.Create(System.Int32,System.String)">
+            <summary>
+            Used to create this exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor(System.Exception,System.Int32,System.String)">
+            <summary>
+            Constructs the exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor">
+            <summary>
+            A runtime assertion failed while performing the operation.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor(System.Exception)">
+            <summary>
+            A runtime assertion failed while performing the operation.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.Assert(System.Boolean)">
+            <summary>
+            if(condition == false) throws A runtime assertion failed while performing the operation.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor(System.String)">
+            <summary>
+            A runtime assertion failed: {0}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.#ctor(System.String,System.Exception)">
+            <summary>
+            A runtime assertion failed: {0}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.AssertionFailedException.Assert(System.Boolean,System.String)">
+            <summary>
+            if(condition == false) throws A runtime assertion failed: {0}
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.IStorageHandle">
+            <summary> Identifies a class as a reference to a node instance </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Collections.INodeStorage">
+            <summary> Represents a persistance mechanic for node data </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.OpenRoot(System.Boolean@)">
+            <summary> Returns an immutable handle to the root node, sets isNew to true if no data exists </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.Reset">
+            <summary> Destroys the entire contents of the storage system except for the root handle which remains valid </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.TryGetNode``1(CSharpTest.Net.Collections.IStorageHandle,``0@,CSharpTest.Net.Serialization.ISerializer{``0})">
+            <summary> Retrieves a single node from storage </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.Create">
+            <summary> Creates a node handle that will represent a new node instance </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.Destroy(CSharpTest.Net.Collections.IStorageHandle)">
+            <summary> Destroys the node that was formally stored by the specified handle </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Collections.INodeStorage.Update``1(CSharpTest.Net.Collections.IStorageHandle,CSharpTest.Net.Serialization.ISerializer{``0},``0)">
+            <summary> Updates the node of the specified handle with the instance given </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Storage.BTreeFileStore">
+            <summary>
+            Provides a file-based storage for the BPlusTree dictionary
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeFileStore.#ctor(System.String,System.Int32,System.Int32,System.Int32,System.IO.FileOptions,System.Boolean)">
+            <summary>
+            Opens an existing BPlusTree file at the path specified, for a new file use CreateNew()
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeFileStore.#ctor(CSharpTest.Net.Interfaces.IFactory{System.IO.Stream},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Opens an existing BPlusTree file at the path specified, for a new file use CreateNew()
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeFileStore.Dispose">
+            <summary>
+            Closes the file in it's current state.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeFileStore.CreateNew(System.String,System.Int32,System.Int32,System.Int32,System.IO.FileOptions)">
+            <summary>
+            Creates an empty file store in the path specified
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeFileStore.CreateNew(CSharpTest.Net.Interfaces.IFactory{System.IO.Stream},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates an empty file store in the path specified
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Storage.BTreeMemoryStore">
+            <summary>
+            Provides an in-memory implementation of the storage services for BPlusTree, useful when testing :)
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Storage.BTreeMemoryStore.#ctor">
+            <summary> Default in-memory storage </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.Resources.ExceptionStrings">
+            <summary>
+            Returns the raw exception strings.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Resources.ExceptionStrings.SafeFormat(System.String,System.Object[])">
+            <summary>
+            Formats a message for an exception
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.Resources.ExceptionStrings.HelpLinkFormat(System.Int32,System.String)">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.AssertionFailedException">
+            <summary>
+            A runtime assertion failed while performing the operation.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.AssertionFailedException_string_message_">
+            <summary>
+            A runtime assertion failed: {0}
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.DeadlockException">
+            <summary>
+            A lock timeout has expired due to a possible deadlock.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.DuplicateKeyException">
+            <summary>
+            The specified key already exists in the collection.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.InvalidConfigurationValueException_string_property_">
+            <summary>
+            The configuration value '{0}' is invalid.
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.InvalidConfigurationValueException_string_property__string_message_">
+            <summary>
+            The configuration value '{0}' is invalid.
+            {1}
+            </summary>
+        </member>
+        <member name="P:CSharpTest.Net.Resources.ExceptionStrings.InvalidNodeHandleException">
+            <summary>
+            A storage handle was invalid or has been corrupted.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.DeadlockException">
+            <summary>
+            Exception class: DeadlockException
+            A lock timeout has expired due to a possible deadlock.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialization constructor
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.Create(System.Int32,System.String)">
+            <summary>
+            Used to create this exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.#ctor(System.Exception,System.Int32,System.String)">
+            <summary>
+            Constructs the exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.#ctor">
+            <summary>
+            A lock timeout has expired due to a possible deadlock.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.#ctor(System.Exception)">
+            <summary>
+            A lock timeout has expired due to a possible deadlock.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DeadlockException.Assert(System.Boolean)">
+            <summary>
+            if(condition == false) throws A lock timeout has expired due to a possible deadlock.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.DuplicateKeyException">
+            <summary>
+            Exception class: DuplicateKeyException
+            The specified key already exists in the collection.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialization constructor
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.Create(System.Int32,System.String)">
+            <summary>
+            Used to create this exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.#ctor(System.Exception,System.Int32,System.String)">
+            <summary>
+            Constructs the exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.#ctor">
+            <summary>
+            The specified key already exists in the collection.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.#ctor(System.Exception)">
+            <summary>
+            The specified key already exists in the collection.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.DuplicateKeyException.Assert(System.Boolean)">
+            <summary>
+            if(condition == false) throws The specified key already exists in the collection.
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.InvalidConfigurationValueException">
+            <summary>
+            Exception class: InvalidConfigurationValueException
+            The configuration value '{0}' is invalid.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialization constructor
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.Create(System.Int32,System.String)">
+            <summary>
+            Used to create this exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.Exception,System.Int32,System.String)">
+            <summary>
+            Constructs the exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.String)">
+            <summary>
+            The configuration value '{0}' is invalid.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.String,System.Exception)">
+            <summary>
+            The configuration value '{0}' is invalid.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.Assert(System.Boolean,System.String)">
+            <summary>
+            if(condition == false) throws The configuration value '{0}' is invalid.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.String,System.String)">
+            <summary>
+            The configuration value '{0}' is invalid.
+            {1}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.#ctor(System.String,System.String,System.Exception)">
+            <summary>
+            The configuration value '{0}' is invalid.
+            {1}
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidConfigurationValueException.Assert(System.Boolean,System.String,System.String)">
+            <summary>
+            if(condition == false) throws The configuration value '{0}' is invalid.
+            {1}
+            </summary>
+        </member>
+        <member name="T:CSharpTest.Net.InvalidNodeHandleException">
+            <summary>
+            Exception class: InvalidNodeHandleException
+            A storage handle was invalid or has been corrupted.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialization constructor
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.Create(System.Int32,System.String)">
+            <summary>
+            Used to create this exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.#ctor(System.Exception,System.Int32,System.String)">
+            <summary>
+            Constructs the exception from an hresult and message bypassing the message formatting
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.#ctor">
+            <summary>
+            A storage handle was invalid or has been corrupted.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.#ctor(System.Exception)">
+            <summary>
+            A storage handle was invalid or has been corrupted.
+            </summary>
+        </member>
+        <member name="M:CSharpTest.Net.InvalidNodeHandleException.Assert(System.Boolean)">
+            <summary>
+            if(condition == false) throws A storage handle was invalid or has been corrupted.
+            </summary>
+        </member>
+    </members>
+</doc>
